@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using TestApi.Controllers;
 using System.Linq;
+using TestApi.Model;
 
 namespace NuNitTestProject
 {
@@ -14,10 +15,6 @@ namespace NuNitTestProject
         private const int WIDTH = 5;
         private const int HEIGHT = 10;
 
-        /*
-         * 
-         */
-        
         [SetUp]
         public void Setup()
         {
@@ -27,10 +24,27 @@ namespace NuNitTestProject
         [Test]
         public void Test1()
         {
-            var controller = new JcsController();
-            //controller.Request = new HttpRequestMessage();
-            var x = controller.GetJcs();
-            Assert.Pass();
+            var triangleController = new TriangleController();
+            var coordinates = triangleController.GetTriangleCoordinates("A", 1);
+
+            Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
+            Coordinate coordinate2 = new Coordinate { column = 0, row = 10 };
+            Coordinate coordinate3 = new Coordinate { column = 10, row = 10 };
+            var location = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
+            Assert.AreEqual("A1", location, "location should equal");
+
+            coordinate1 = new Coordinate { column = 50, row = 50 };
+            coordinate2 = new Coordinate { column = 60, row = 50 };
+            coordinate3 = new Coordinate { column = 60, row = 60 };
+            location = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
+            Assert.AreEqual("F12", location, "location should equal");
+
+            coordinate1 = new Coordinate { column = 30, row = 30 };
+            coordinate2 = new Coordinate { column = 40, row = 30 };
+            coordinate3 = new Coordinate { column = 40, row = 40 };
+            location = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
+            Assert.AreEqual("D8", location, "location should equal");
+
         }
         #region return location
 
@@ -45,16 +59,16 @@ namespace NuNitTestProject
             var y = GetColumn(columns);
             Assert.AreEqual(10, y);
 
-            Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
-            Coordinate coordinate2 = new Coordinate { column = 0, row = 10 };
-            Coordinate coordinate3 = new Coordinate { column = 10, row = 10 };
-            List<Coordinate> coordinates = new List<Coordinate> { coordinate1 , coordinate2 , coordinate3 };
+            CoordinateStruct coordinate1 = new CoordinateStruct { column = 0, row = 0 };
+            CoordinateStruct coordinate2 = new CoordinateStruct { column = 0, row = 10 };
+            CoordinateStruct coordinate3 = new CoordinateStruct { column = 10, row = 10 };
+            List<CoordinateStruct> coordinates = new List<CoordinateStruct> { coordinate1 , coordinate2 , coordinate3 };
 
             var location = GetLocation(coordinates);
             Assert.AreEqual("A1", location);
         }
 
-        private string GetLocation(IEnumerable<Coordinate> coordinates)
+        private string GetLocation(IEnumerable<CoordinateStruct> coordinates)
         {
             var rows = coordinates.Select(c => c.row);
             var columns = coordinates.Select(c => c.column);
@@ -115,7 +129,9 @@ namespace NuNitTestProject
         [Test]
         public void Test2var ()
         {
-            IEnumerable<Coordinate> coordinates = GetCoordinatePositions("B", 1);
+            var triangleController = new TriangleController();
+            //IEnumerable<CoordinateStruct> coordinates = GetCoordinatePositions("B", 1);
+            var coordinates = triangleController.GetTriangleCoordinates("B", 1);
             Assert.IsNotNull(coordinates);
             Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
             foreach (Coordinate coord in coordinates)
@@ -126,7 +142,7 @@ namespace NuNitTestProject
             }
 
 
-            coordinates = GetCoordinatePositions("E", 8);
+            coordinates = triangleController.GetTriangleCoordinates("E", 8);
             Assert.IsNotNull(coordinates);
             Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
             foreach (Coordinate coord in coordinates)
@@ -136,7 +152,7 @@ namespace NuNitTestProject
                 Assert.IsTrue(coordinates.Any(c => c.column == 40 && c.row == 50), "should have found coordinate");
             }
 
-            coordinates = GetCoordinatePositions("A", 1);
+            coordinates = triangleController.GetTriangleCoordinates("A", 1);
             Assert.IsNotNull(coordinates);
             Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
             foreach (Coordinate coord in coordinates)
@@ -146,7 +162,7 @@ namespace NuNitTestProject
                 Assert.IsTrue(coordinates.Any(c => c.column == 10 && c.row == 10), "should have found coordinate");
             }
 
-            coordinates = GetCoordinatePositions("F", 12);
+            coordinates = triangleController.GetTriangleCoordinates("F", 12);
             Assert.IsNotNull(coordinates);
             Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
             foreach (Coordinate coord in coordinates)
@@ -163,7 +179,7 @@ namespace NuNitTestProject
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <returns></returns>
-        private IEnumerable<Coordinate> GetCoordinatePositions(string row, int column)
+        private IEnumerable<CoordinateStruct> GetCoordinatePositions(string row, int column)
         {
             int topRowLocation = GetTopRowCoordinateLocation(row);
             int bottomRowLocation = GetBottomRowCoordinateLocation(topRowLocation);
@@ -173,15 +189,15 @@ namespace NuNitTestProject
             //topRowLocation = topRowLocation == -1 ? 0 : topRowLocation;
             //leftColumnLocation = leftColumnLocation == -1 ? 0 : leftColumnLocation;
 
-            Coordinate coordinate1 = new Coordinate();
+            CoordinateStruct coordinate1 = new CoordinateStruct();
             coordinate1.row = topRowLocation;
             coordinate1.column = leftColumnLocation;
 
-            Coordinate coordinate2 = new Coordinate();
+            CoordinateStruct coordinate2 = new CoordinateStruct();
             coordinate2.row = bottomRowLocation;
             coordinate2.column = righttColumnLocation;
 
-            Coordinate coordinate3 = new Coordinate();
+            CoordinateStruct coordinate3 = new CoordinateStruct();
             if (IsIntegerEven(column))
             {
                 coordinate3.row = topRowLocation;
@@ -198,7 +214,7 @@ namespace NuNitTestProject
             //  if even then top and right positions
             //    else bottom ande left positions
 
-            return new List<Coordinate> { coordinate1, coordinate2, coordinate3 };
+            return new List<CoordinateStruct> { coordinate1, coordinate2, coordinate3 };
         }
 
         private int GetTopRowCoordinateLocation(string row)
@@ -234,7 +250,7 @@ namespace NuNitTestProject
             return number % 2 == 0;
         }
 
-        private struct Coordinate
+        private struct CoordinateStruct
         {
             public int row;
             public int column;
