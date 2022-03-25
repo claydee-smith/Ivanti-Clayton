@@ -10,7 +10,8 @@ namespace NuNitTestProject
 {
     public class Tests
     {
-        private readonly string[] rows = new string[] {"A", "B", "C", "D", "E", "F"};
+        private readonly string[] _rows = new string[] {"A", "B", "C", "D", "E", "F"};
+        private Dictionary<string, List<Coordinate>>  _triangleCoordinates = new Dictionary<string, List<Coordinate>>();
 
         private const int WIDTH = 5;
         private const int HEIGHT = 10;
@@ -18,7 +19,7 @@ namespace NuNitTestProject
         [SetUp]
         public void Setup()
         {
-
+            BuildExpectedResults();
         }
 
         [Test]
@@ -46,26 +47,77 @@ namespace NuNitTestProject
             Assert.AreEqual("D8", location, "location should equal");
 
         }
-        #region return location
 
         [Test]
         public void ReturnLocationTest()
         {
-            List<int> rows = new List<int> { 30, 20, 30 };
-            var x = GetRow(rows);
-            Assert.AreEqual("C", x);
+            /*
+             * loop thru triangle coordinaetes
+             * - get the each set of coordinates
+             * - get the expected location
+             * - call api
+             * - assert locations equal
+             */
+            var triangleController = new TriangleController();
 
-            List<int> columns = new List<int> { 50, 50, 40 };
-            var y = GetColumn(columns);
-            Assert.AreEqual(10, y);
+            foreach (var triangleLocation in _triangleCoordinates)
+            {
+                string column = triangleLocation.Key.Substring(0, 1);
+                int row = int.Parse(triangleLocation.Key.Substring(1, triangleLocation.Key.Length-1));
 
-            CoordinateStruct coordinate1 = new CoordinateStruct { column = 0, row = 0 };
-            CoordinateStruct coordinate2 = new CoordinateStruct { column = 0, row = 10 };
-            CoordinateStruct coordinate3 = new CoordinateStruct { column = 10, row = 10 };
-            List<CoordinateStruct> coordinates = new List<CoordinateStruct> { coordinate1 , coordinate2 , coordinate3 };
+                string expectedLocation = column + row;
+                Coordinate coordinate1 = triangleLocation.Value[0];
+                Coordinate coordinate2 = triangleLocation.Value[1];
+                Coordinate coordinate3 = triangleLocation.Value[2];
 
-            var location = GetLocation(coordinates);
-            Assert.AreEqual("A1", location);
+                var location = triangleController.GetTriangleLocation(coordinate1,coordinate2, coordinate3);
+                Assert.AreEqual(expectedLocation, location, "locations for triangle should be equal");
+            }
+        }
+
+ #region return location
+
+            [Test]
+        public void ReturnCoordinatesTest()
+        {
+            var triangleController = new TriangleController();
+
+            foreach (var triangleLocation in _triangleCoordinates)
+            {
+                string column = triangleLocation.Key.Substring(0, 1);
+                int row = int.Parse(triangleLocation.Key.Substring(1, 1));
+
+                var coordinates = triangleController.GetTriangleCoordinates(column, row);
+                Assert.IsNotNull(coordinates, "coordinates for triangle should not be null");
+
+                foreach (var coordinate in coordinates)
+                {
+                    Assert.IsNotNull(coordinate, $"coordinates for {column + row } should not be null");
+                    var expectedCoordinates = _triangleCoordinates[column + row];
+                    foreach (var expectedCoordinate in expectedCoordinates)
+                    {
+                        Assert.IsTrue(expectedCoordinates.Any(e => e.row == coordinate.row && e.column == coordinate.column), $"Should have found coordinate for {column + row }");
+                    }
+                }
+            }
+
+
+            //List<int> rows = new List<int> { 30, 20, 30 };
+
+            //var x = GetRow(rows);
+            //Assert.AreEqual("C", x);
+
+            //List<int> columns = new List<int> { 50, 50, 40 };
+            //var y = GetColumn(columns);
+            //Assert.AreEqual(10, y);
+
+            //CoordinateStruct coordinate1 = new CoordinateStruct { column = 0, row = 0 };
+            //CoordinateStruct coordinate2 = new CoordinateStruct { column = 0, row = 10 };
+            //CoordinateStruct coordinate3 = new CoordinateStruct { column = 10, row = 10 };
+            //List<CoordinateStruct> coordinates = new List<CoordinateStruct> { coordinate1 , coordinate2 , coordinate3 };
+
+            //var location = GetLocation(coordinates);
+            //Assert.AreEqual("A1", location);
         }
 
         private string GetLocation(IEnumerable<CoordinateStruct> coordinates)
@@ -94,7 +146,7 @@ namespace NuNitTestProject
                 rowIndex = (duplicateRowCoordinate / 10);
             }
 
-            return rows[rowIndex - 1];
+            return _rows[rowIndex - 1];
         }
 
         private int GetColumn(IEnumerable<int> columnCoordinate)
@@ -219,7 +271,7 @@ namespace NuNitTestProject
 
         private int GetTopRowCoordinateLocation(string row)
         {
-            var x = Array.FindIndex(rows, r => r == row);
+            var x = Array.FindIndex(_rows, r => r == row);
             return (x * 10);
         }
 
@@ -256,5 +308,48 @@ namespace NuNitTestProject
             public int column;
         }
         #endregion return coordinates
+
+        private void BuildExpectedResults()
+        {
+            int rightColumnCoordinate = 0;
+            int leftColumnCoordinate = 0;
+
+            foreach (string row in _rows)
+            {
+                for (int i = 1; i < 13; i++)
+                {
+                    Coordinate coordinate1 = new Coordinate();
+                    Coordinate coordinate2 = new Coordinate();
+                    Coordinate coordinate3 = new Coordinate();
+
+                    int topRowCoordinate = GetTopRowCoordinateLocation(row);
+                    int bottomRowCoordinate = GetBottomRowCoordinateLocation(topRowCoordinate);
+                    rightColumnCoordinate = GetRightCoordinateLocation(i);
+                    leftColumnCoordinate = GetLeftCoordinateLocation(rightColumnCoordinate);
+
+                    if (IsIntegerEven(i))
+                    {
+                        coordinate1.row = topRowCoordinate;
+                        coordinate1.column = leftColumnCoordinate;
+                        coordinate2.row = topRowCoordinate;
+                        coordinate2.column = rightColumnCoordinate;
+                        coordinate3.row = bottomRowCoordinate;
+                        coordinate3.column = rightColumnCoordinate;   
+                    }
+                    else
+                    {
+                        coordinate1.row = topRowCoordinate;
+                        coordinate1.column = leftColumnCoordinate;
+                        coordinate2.row = bottomRowCoordinate;
+                        coordinate2.column = leftColumnCoordinate;
+                        coordinate3.row = bottomRowCoordinate;
+                        coordinate3.column = rightColumnCoordinate;
+                    }
+
+                    _triangleCoordinates.Add(row + i, new List<Coordinate> { coordinate1, coordinate2, coordinate3 });
+
+                }
+            }
+        }
     }
 }
