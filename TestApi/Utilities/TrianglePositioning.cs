@@ -5,7 +5,8 @@ namespace TestApi.Utilities
 {
     public static class TrianglePositioning
     {
-        private static readonly string[] rows = new string[] { "A", "B", "C", "D", "E", "F" };
+        private static readonly string[] _rows = new string[] { "A", "B", "C", "D", "E", "F" };
+        private static readonly int[] _locations = new int[] { 0, 10, 20, 30, 40, 50, 60 };
 
         private const int WIDTH = 5;
         private const int HEIGHT = 10;
@@ -18,6 +19,13 @@ namespace TestApi.Utilities
         /// <returns>An IEnumerable of Coordinates for the triangle</returns>
         public static IEnumerable<Coordinate> GetTriangleCoordinatesByLocation(string row, int column)
         {
+            //if (IsLocationValid(row, column) == false)
+            //{
+            //    throw new ArgumentException("Triangle location is not valid.");
+            //}
+
+            IsLocationValid(row, column);
+
             int topRowLocation = GetTopRowCoordinateLocation(row);
             int bottomRowLocation = GetBottomRowCoordinateLocation(topRowLocation);
             int righttColumnLocation = GetRightCoordinateLocation(column);
@@ -56,9 +64,72 @@ namespace TestApi.Utilities
         public static string GetTriangleLocationByCoordinates(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
         {
             List<Coordinate> coordinates = new List<Coordinate> { coordinate1, coordinate2, coordinate3 };
+            AreCoordinatesValid(coordinates);
             return GetLocation(coordinates);
         }
 
+        private static void IsLocationValid(string row, int column)
+        {
+            if (_rows.Any(r => r == row) == false)
+            {
+                throw new ArgumentException("Triangle row location is not valid.");
+            }
+
+            if ( column <0 || column > 12)
+            {
+                throw new ArgumentException("Triangle column location is not valid.");
+            }
+
+            //return true;
+        }
+
+        private static void AreCoordinatesValid(IEnumerable<Coordinate> coordinates)
+        {
+            foreach (Coordinate coordinate in coordinates)
+            {
+                if (coordinate == null ||
+                    _locations.Any(c => c == coordinate.row) == false ||
+                    _locations.Any(c => c == coordinate.column) == false ||
+                    AreRowAndColumnLocationsValid(coordinates) == false)
+                {
+                    throw new ArgumentException("One or more coordinates is invalid.");
+                }
+            }
+        }
+
+        private static bool AreRowAndColumnLocationsValid(IEnumerable<Coordinate> coordinates)
+        {
+            IEnumerable<int> columnPositions = coordinates.Select(c => c.column);
+            IEnumerable<int> rowPositions = coordinates.Select(c => c.row);
+
+            if ((AreLocationsValid(columnPositions) && AreLocationsValid(rowPositions)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool AreLocationsValid(IEnumerable<int> positions)
+        {
+            var duplicateLocation = positions.GroupBy(c => c)
+                .Select(c => new { Location = c.Key, Count = c.Count() })
+                .OrderByDescending(g => g.Count)
+                .First();
+
+            if (duplicateLocation.Count != 2)
+            {
+                return false;
+            }
+
+            int singleLocation = positions.Where(p => p != duplicateLocation.Location).First();
+            if (Math.Abs(duplicateLocation.Location - singleLocation) != HEIGHT)
+            {
+                return false;
+            }
+
+            return true;
+        }
         /// <summary>
         /// Get the top row coordinate for the triangle
         /// </summary>
@@ -66,8 +137,8 @@ namespace TestApi.Utilities
         /// <returns>The top row coordinate for the triangle</returns>
         private static int GetTopRowCoordinateLocation(string row)
         {
-            var x = Array.FindIndex(rows, r => r == row);
-            return (x * 10);
+            var x = Array.FindIndex(_rows, r => r == row);
+            return (x * HEIGHT);
         }
 
         /// <summary>
@@ -153,7 +224,7 @@ namespace TestApi.Utilities
                 rowIndex = (duplicateRowCoordinate / 10);
             }
 
-            return rows[rowIndex - 1];
+            return _rows[rowIndex - 1];
         }
 
         /// <summary>

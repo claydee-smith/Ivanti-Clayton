@@ -11,7 +11,7 @@ namespace TestApi.Controllers
         [HttpGet("GetTriangleCoordinates")]
         public IEnumerable<Coordinate> GetTriangleCoordinates(string row, int column)
         {
-            return TrianglePositioning.GetTriangleCoordinatesByLocation(row, column);  
+            return TrianglePositioning.GetTriangleCoordinatesByLocation(row, column);
         }
 
         [HttpGet("GetTriangleLocation")]
