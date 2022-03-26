@@ -9,8 +9,8 @@ namespace TestApi.Controllers
     [Route("[controller]")]
     public class TriangleController : ControllerBase
     {
-        [HttpGet("GetTriangleCoordinates")]
-        public ActionResult<IEnumerable<Coordinate>> GetTriangleCoordinates(string row, int column)
+        [HttpGet("GetTriangleCoordinatesByLocation")]
+        public ActionResult<IEnumerable<Coordinate>> GetTriangleCoordinatesByLocation(string row, int column)
         {
             try
             {
@@ -22,8 +22,8 @@ namespace TestApi.Controllers
             }
         }
 
-        [HttpGet("GetTriangleLocation")]
-        public ActionResult<string> GetTriangleLocation(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
+        [HttpGet("GetTriangleLocationByCoordinates")]
+        public ActionResult<string> GetTriangleLocationByCoordinates(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
         {
             try
             {
