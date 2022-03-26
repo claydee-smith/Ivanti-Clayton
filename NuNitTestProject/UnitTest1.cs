@@ -43,7 +43,6 @@ namespace NuNitTestProject
         public void ReturnLocationTest()
         {
             var triangleController = new TriangleController();
-
             foreach (var triangleLocation in _triangleCoordinates)
             {
                 string column = triangleLocation.Key.Substring(0, 1);
@@ -54,7 +53,11 @@ namespace NuNitTestProject
                 Coordinate coordinate2 = triangleLocation.Value[1];
                 Coordinate coordinate3 = triangleLocation.Value[2];
 
-                var location = triangleController.GetTriangleLocation(coordinate1,coordinate2, coordinate3);
+                var response = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
+                Assert.IsNotNull(response, "Response should not be null");
+                Assert.IsInstanceOf<OkObjectResult>(response.Result, "Rsponse should be Ok");
+
+                var location = ((OkObjectResult)response.Result).Value;
                 Assert.AreEqual(expectedLocation, location, "locations for triangle should be equal");
             }
         }
@@ -66,9 +69,8 @@ namespace NuNitTestProject
         public void AllCoordinatesTheSame()
         {
             var triangleController = new TriangleController();
-
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(new Coordinate(), new Coordinate(), new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+            var response = triangleController.GetTriangleLocation(new Coordinate(), new Coordinate(), new Coordinate());
+            ValidateBadResponsetForInvalidCoordinates(response);
         }
 
         /// <summary>
@@ -80,8 +82,8 @@ namespace NuNitTestProject
             var triangleController = new TriangleController();
 
             Coordinate coordinate = new Coordinate { column = 10, row = 1 };
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+            var response = triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate());
+            ValidateBadResponsetForInvalidCoordinates(response);
         }
 
         /// <summary>
@@ -93,8 +95,8 @@ namespace NuNitTestProject
             var triangleController = new TriangleController();
 
             Coordinate coordinate = new Coordinate { column = 1, row = 10 };
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+            var response = triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate());
+            ValidateBadResponsetForInvalidCoordinates(response);
         }
 
         /// <summary>
@@ -107,10 +109,17 @@ namespace NuNitTestProject
 
             Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
             Coordinate coordinate2 = new Coordinate { column = 50, row = 50 };
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate1, coordinate2, new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+            var response = triangleController.GetTriangleLocation(coordinate1, coordinate2, new Coordinate());
+            ValidateBadResponsetForInvalidCoordinates(response);
         }
 
+        private void ValidateBadResponsetForInvalidCoordinates(ActionResult<string> actionResult)
+        {
+            Assert.IsNotNull(actionResult, "Response should not be null");
+            Assert.IsInstanceOf<BadRequestObjectResult>(actionResult.Result, "Response should be Bad");
+            var errorMessage = ((BadRequestObjectResult)actionResult.Result).Value;
+            Assert.AreEqual(errorMessage, INVALID_COORDINATE_ERR_MSG, "wrong error message returned.");
+        }
         #endregion return location tests
 
         #region return coordinates tests
@@ -133,8 +142,12 @@ namespace NuNitTestProject
                 string column = triangleLocation.Key.Substring(0, 1);
                 int row = int.Parse(triangleLocation.Key.Substring(1, 1));
 
-                var coordinates = triangleController.GetTriangleCoordinates(column, row);
-                Assert.IsNotNull(coordinates, "coordinates for triangle should not be null");
+                var response = triangleController.GetTriangleCoordinates(column, row);
+                Assert.IsNotNull(response, "Response should not be null");
+                Assert.IsInstanceOf<OkObjectResult>(response.Result, "Rsponse should be Ok");
+
+                var coordinates = ((OkObjectResult)response.Result).Value as IEnumerable<Coordinate>;
+                Assert.IsNotNull(coordinates, "Coordinates should not null");
 
                 foreach (var coordinate in coordinates)
                 {
@@ -155,9 +168,8 @@ namespace NuNitTestProject
         public void InvalidRowLocation()
         {
             var triangleController = new TriangleController();
-           
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleCoordinates("Z", 1));
-            AssertException(exception, "Triangle row location is not valid.");
+            var response = triangleController.GetTriangleCoordinates("Z", 1);
+            ValidateBadResponseForInvalidlocations(response, "Triangle row location is not valid.");
         }
 
         /// <summary>
@@ -167,9 +179,8 @@ namespace NuNitTestProject
         public void InvalidColumnLocationTooSmall()
         {
             var triangleController = new TriangleController();
-
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleCoordinates("A", -1));
-            AssertException(exception, "Triangle column location is not valid.");
+            var response = triangleController.GetTriangleCoordinates("A", -1);
+            ValidateBadResponseForInvalidlocations(response, "Triangle column location is not valid.");
         }
 
         /// <summary>
@@ -179,12 +190,18 @@ namespace NuNitTestProject
         public void InvalidColumnLocationTooBig()
         {
             var triangleController = new TriangleController();
-
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleCoordinates("A", 13));
-            AssertException(exception, "Triangle column location is not valid.");
+            var response = triangleController.GetTriangleCoordinates("A", 13);
+            ValidateBadResponseForInvalidlocations(response, "Triangle column location is not valid.");
         }
 
-        
+        private void ValidateBadResponseForInvalidlocations(ActionResult<IEnumerable<Coordinate>> actionResult, string errorMessageExpected)
+        {
+            Assert.IsNotNull(actionResult, "Response should not be null");
+            Assert.IsInstanceOf<BadRequestObjectResult>(actionResult.Result, "Response should be Bad");
+            var errorMessageReturned = ((BadRequestObjectResult)actionResult.Result).Value;
+            Assert.AreEqual(errorMessageExpected, errorMessageReturned, "wrong error message returned.");
+        }
+
         #endregion return coordinates tests
 
         /// <summary>
@@ -211,9 +228,6 @@ namespace NuNitTestProject
             int bottomRowLocation = GetBottomRowCoordinateLocation(topRowLocation);
             int righttColumnLocation = GetRightCoordinateLocation(column);
             int leftColumnLocation = GetLeftCoordinateLocation(righttColumnLocation);
-
-            //topRowLocation = topRowLocation == -1 ? 0 : topRowLocation;
-            //leftColumnLocation = leftColumnLocation == -1 ? 0 : leftColumnLocation;
 
             CoordinateStruct coordinate1 = new CoordinateStruct();
             coordinate1.row = topRowLocation;

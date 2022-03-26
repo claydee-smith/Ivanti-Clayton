@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Web;
 using TestApi.Model;
 using TestApi.Utilities;
 
@@ -9,15 +10,29 @@ namespace TestApi.Controllers
     public class TriangleController : ControllerBase
     {
         [HttpGet("GetTriangleCoordinates")]
-        public IEnumerable<Coordinate> GetTriangleCoordinates(string row, int column)
+        public ActionResult<IEnumerable<Coordinate>> GetTriangleCoordinates(string row, int column)
         {
-            return TrianglePositioning.GetTriangleCoordinatesByLocation(row, column);
+            try
+            {
+                return Ok(TrianglePositioning.GetTriangleCoordinatesByLocation(row, column));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("GetTriangleLocation")]
-        public string GetTriangleLocation(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
+        public ActionResult<string> GetTriangleLocation(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
         {
-            return TrianglePositioning.GetTriangleLocationByCoordinates(coordinate1, coordinate2, coordinate3);
+            try
+            {
+                return Ok(TrianglePositioning.GetTriangleLocationByCoordinates(coordinate1, coordinate2, coordinate3));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);  
+            }
         }
     }
 }
