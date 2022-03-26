@@ -14,10 +14,8 @@ namespace NuNitTestProject
         private readonly string[] _rows = new string[] {"A", "B", "C", "D", "E", "F"};
         private Dictionary<string, List<Coordinate>>  _triangleCoordinates = new Dictionary<string, List<Coordinate>>();
 
-        private const int WIDTH = 5;
         private const int HEIGHT = 10;
         private const string INVALID_COORDINATE_ERR_MSG = "One or more coordinates is invalid.";
-        private const string EXCEPTION_NOT_NULL_MSG = "Exception should not be null";
 
         /// <summary>
         /// Build the grid of expected results for the triangle locations with corresponding coordinates

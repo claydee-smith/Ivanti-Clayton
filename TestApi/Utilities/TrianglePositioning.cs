@@ -1,6 +1,5 @@
 ﻿using TestApi.Model;
 
-
 namespace TestApi.Utilities
 {
     public static class TrianglePositioning
@@ -19,11 +18,6 @@ namespace TestApi.Utilities
         /// <returns>An IEnumerable of Coordinates for the triangle</returns>
         public static IEnumerable<Coordinate> GetTriangleCoordinatesByLocation(string row, int column)
         {
-            //if (IsLocationValid(row, column) == false)
-            //{
-            //    throw new ArgumentException("Triangle location is not valid.");
-            //}
-
             IsLocationValid(row, column);
 
             int topRowLocation = GetTopRowCoordinateLocation(row);
