@@ -17,7 +17,6 @@ namespace NuNitTestProject
         private const int WIDTH = 5;
         private const int HEIGHT = 10;
         private const string INVALID_COORDINATE_ERR_MSG = "One or more coordinates is invalid.";
-        private const string INVALID_LOCATION_ERR_MSG = "Triangle row location is not valid.";
         private const string EXCEPTION_NOT_NULL_MSG = "Exception should not be null";
 
         /// <summary>
@@ -26,7 +25,7 @@ namespace NuNitTestProject
         [OneTimeSetUp]
         public void Setup()
         {
-            BuildExpectedResults();
+            ManuallyBuildExpectedResults();
         }
         
 #region return location tests
@@ -381,6 +380,110 @@ namespace NuNitTestProject
 
                 }
             }
+        }
+
+        private void ManuallyBuildExpectedResults()
+        {
+            AddOddColumnCoordinate("A1", 0, 0);
+            AddOddColumnCoordinate("A3", 0, 10);
+            AddOddColumnCoordinate("A5", 0, 20);
+            AddOddColumnCoordinate("A7", 0, 30);
+            AddOddColumnCoordinate("A9", 0, 40);
+            AddOddColumnCoordinate("A11", 0, 50);
+
+            AddEvenColumnCoordinate("A2", 0, 0);
+            AddEvenColumnCoordinate("A4", 0, 10);
+            AddEvenColumnCoordinate("A6", 0, 20);
+            AddEvenColumnCoordinate("A8", 0, 30);
+            AddEvenColumnCoordinate("A10", 0, 40);
+            AddEvenColumnCoordinate("A12", 0, 50);
+
+            AddOddColumnCoordinate("B1", 10, 0);
+            AddOddColumnCoordinate("B3", 10, 10);
+            AddOddColumnCoordinate("B5", 10, 20);
+            AddOddColumnCoordinate("B7", 10, 30);
+            AddOddColumnCoordinate("B9", 10, 40);
+            AddOddColumnCoordinate("B11", 10, 50);
+
+            AddEvenColumnCoordinate("B2", 10, 0);
+            AddEvenColumnCoordinate("B4", 10, 10);
+            AddEvenColumnCoordinate("B6", 10, 20);
+            AddEvenColumnCoordinate("B8", 10, 30);
+            AddEvenColumnCoordinate("B10", 10, 40);
+            AddEvenColumnCoordinate("B12", 10, 50);
+
+            AddOddColumnCoordinate("C1", 20, 0);
+            AddOddColumnCoordinate("C3", 20, 10);
+            AddOddColumnCoordinate("C5", 20, 20);
+            AddOddColumnCoordinate("C7", 20, 30);
+            AddOddColumnCoordinate("C9", 20, 40);
+            AddOddColumnCoordinate("C11", 20, 50);
+
+            AddEvenColumnCoordinate("C2", 20, 0);
+            AddEvenColumnCoordinate("C4", 20, 10);
+            AddEvenColumnCoordinate("C6", 20, 20);
+            AddEvenColumnCoordinate("C8", 20, 30);
+            AddEvenColumnCoordinate("C10", 20, 40);
+            AddEvenColumnCoordinate("C12", 20, 50);
+
+            AddOddColumnCoordinate("D1", 30, 0);
+            AddOddColumnCoordinate("D3", 30, 10);
+            AddOddColumnCoordinate("D5", 30, 20);
+            AddOddColumnCoordinate("D7", 30, 30);
+            AddOddColumnCoordinate("D9", 30, 40);
+            AddOddColumnCoordinate("D11", 30, 50);
+
+            AddEvenColumnCoordinate("D2", 30, 0);
+            AddEvenColumnCoordinate("D4", 30, 10);
+            AddEvenColumnCoordinate("D6", 30, 20);
+            AddEvenColumnCoordinate("D8", 30, 30);
+            AddEvenColumnCoordinate("D10", 30, 40);
+            AddEvenColumnCoordinate("D12", 30, 50);
+
+            AddOddColumnCoordinate("E1", 40, 0);
+            AddOddColumnCoordinate("E3", 40, 10);
+            AddOddColumnCoordinate("E5", 40, 20);
+            AddOddColumnCoordinate("E7", 40, 30);
+            AddOddColumnCoordinate("E9", 40, 40);
+            AddOddColumnCoordinate("E11", 40, 50);
+
+            AddEvenColumnCoordinate("E2", 40, 0);
+            AddEvenColumnCoordinate("E4", 40, 10);
+            AddEvenColumnCoordinate("E6", 40, 20);
+            AddEvenColumnCoordinate("E8", 40, 30);
+            AddEvenColumnCoordinate("E10", 40, 40);
+            AddEvenColumnCoordinate("E12", 40, 50);
+
+            AddOddColumnCoordinate("F1", 50, 0);
+            AddOddColumnCoordinate("F3", 50, 10);
+            AddOddColumnCoordinate("F5", 50, 20);
+            AddOddColumnCoordinate("F7", 50, 30);
+            AddOddColumnCoordinate("F9", 50, 40);
+            AddOddColumnCoordinate("F11", 50, 50);
+
+            AddEvenColumnCoordinate("F2", 50, 0);
+            AddEvenColumnCoordinate("F4", 50, 10);
+            AddEvenColumnCoordinate("F6", 50, 20);
+            AddEvenColumnCoordinate("F8", 50, 30);
+            AddEvenColumnCoordinate("F10", 50, 40);
+            AddEvenColumnCoordinate("F12", 50, 50);
+
+        }
+
+        private void AddOddColumnCoordinate(string location, int topRowLocation, int leftColumnlocation)
+        {
+            Coordinate coordinate1 = new Coordinate { row = topRowLocation, column = leftColumnlocation };
+            Coordinate coordinate2 = new Coordinate { row = topRowLocation + HEIGHT, column = leftColumnlocation };
+            Coordinate coordinate3 = new Coordinate { row = topRowLocation + HEIGHT, column = leftColumnlocation + HEIGHT };
+            _triangleCoordinates.Add(location, new List<Coordinate> { coordinate1, coordinate2, coordinate3 });
+        }
+
+        private void AddEvenColumnCoordinate(string location, int topRowLocation, int leftColumnlocation)
+        {
+            Coordinate coordinate1 = new Coordinate { row = topRowLocation, column = leftColumnlocation };
+            Coordinate coordinate2 = new Coordinate { row = topRowLocation, column = leftColumnlocation + HEIGHT};
+            Coordinate coordinate3 = new Coordinate { row = topRowLocation + HEIGHT, column = leftColumnlocation + HEIGHT };
+            _triangleCoordinates.Add(location, new List<Coordinate> { coordinate1, coordinate2, coordinate3 });
         }
     }
 }
