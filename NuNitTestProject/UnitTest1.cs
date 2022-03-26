@@ -20,7 +20,7 @@ namespace NuNitTestProject
         private const string EXCEPTION_NOT_NULL_MSG = "Exception should not be null";
 
         /// <summary>
-        /// Build the grid with the triangle  locations and corresponding coordinates
+        /// Build the grid of expected results for the triangle locations with corresponding coordinates
         /// </summary>
         [OneTimeSetUp]
         public void Setup()
@@ -62,7 +62,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test when all coordinates are the same returns an exception
+        /// Test when all coordinates are the same returns a BadResponse
         /// </summary>
         [Test]
         public void AllCoordinatesTheSame()
@@ -73,7 +73,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test an invalid row coordinate returns an exception
+        /// Test an invalid row coordinate returns a BadResponse
         /// </summary>
         [Test]
         public void InvalidRowCoordinate()
@@ -86,7 +86,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test an invalid column coordinate returns an exception
+        /// Test an invalid column coordinate returns a BadResponse
         /// </summary>
         [Test]
         public void InvalidColumnCoordinate()
@@ -99,7 +99,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test an invalid row/column combination coordinate returns an exception
+        /// Test an invalid row/column combination coordinate returns a BadResponse
         /// </summary>
         [Test]
         public void InvalidCoordinateCombination()
@@ -112,6 +112,10 @@ namespace NuNitTestProject
             ValidateBadResponsetForInvalidCoordinates(response);
         }
 
+        /// <summary>
+        /// Commmon method to validate the resonse is bad and the expected error message is returned
+        /// </summary>
+        /// <param name="actionResult"></param>
         private void ValidateBadResponsetForInvalidCoordinates(ActionResult<string> actionResult)
         {
             Assert.IsNotNull(actionResult, "Response should not be null");
@@ -125,11 +129,10 @@ namespace NuNitTestProject
 
         /// <summary>
         /// Test passing in all the triangle locations to get the triangle coordinates
-        /// loop thru triangle coordinaetes
-        /// - get the each set of coordinates
-        /// - get the expected location
+        /// loop thru triangle locations
+        /// - get the expected coordinates
         /// - call api
-        /// - assert locations equal
+        /// - assert coordinates equal
         /// </summary>
         [Test]
         public void ReturnCoordinatesTest()
@@ -161,7 +164,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test the an invalid location row returns an exception
+        /// Test the an invalid location row returns a BadResponse
         /// </summary>
         [Test]
         public void InvalidRowLocation()
@@ -172,7 +175,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test the a location column < 0 returns an exception
+        /// Test the a location column < 0 returns a BadResponse
         /// </summary>
         [Test]
         public void InvalidColumnLocationTooSmall()
@@ -183,7 +186,7 @@ namespace NuNitTestProject
         }
 
         /// <summary>
-        /// Test the a location column > 12 returns an exception
+        /// Test the a location column > 12 returns a BadResponse
         /// </summary>
         [Test]
         public void InvalidColumnLocationTooBig()
@@ -193,6 +196,11 @@ namespace NuNitTestProject
             ValidateBadResponseForInvalidlocations(response, "Triangle column location is not valid.");
         }
 
+        /// <summary>
+        /// Common method to validate the resonse is bad and the expected error message is returned
+        /// </summary>
+        /// <param name="actionResult"></param>
+        /// <param name="errorMessageExpected"></param>
         private void ValidateBadResponseForInvalidlocations(ActionResult<IEnumerable<Coordinate>> actionResult, string errorMessageExpected)
         {
             Assert.IsNotNull(actionResult, "Response should not be null");
@@ -204,184 +212,8 @@ namespace NuNitTestProject
         #endregion return coordinates tests
 
         /// <summary>
-        /// Method to assert correct exception thrown
+        /// Manualy build the expected Location and corresponding coordinates
         /// </summary>
-        /// <param name="exception"></param>
-        /// <param name="message"></param>
-        private void AssertException(Exception exception, string message)
-        {
-            Assert.IsNotNull(exception, EXCEPTION_NOT_NULL_MSG);
-            Assert.AreEqual(exception.Message, message);
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        private IEnumerable<CoordinateStruct> GetCoordinatePositions(string row, int column)
-        {
-            int topRowLocation = GetTopRowCoordinateLocation(row);
-            int bottomRowLocation = GetBottomRowCoordinateLocation(topRowLocation);
-            int righttColumnLocation = GetRightCoordinateLocation(column);
-            int leftColumnLocation = GetLeftCoordinateLocation(righttColumnLocation);
-
-            CoordinateStruct coordinate1 = new CoordinateStruct();
-            coordinate1.row = topRowLocation;
-            coordinate1.column = leftColumnLocation;
-
-            CoordinateStruct coordinate2 = new CoordinateStruct();
-            coordinate2.row = bottomRowLocation;
-            coordinate2.column = righttColumnLocation;
-
-            CoordinateStruct coordinate3 = new CoordinateStruct();
-            if (IsIntegerEven(column))
-            {
-                coordinate3.row = topRowLocation;
-                coordinate3.column = righttColumnLocation;
-            }
-            else
-            {
-                coordinate3.row = bottomRowLocation;
-                coordinate3.column = leftColumnLocation;
-            }
-            //hyp 1 is always top and left positions
-            //hyp 2 is always bottom and  right
-            //coord 3 is based on the column
-            //  if even then top and right positions
-            //    else bottom ande left positions
-
-            return new List<CoordinateStruct> { coordinate1, coordinate2, coordinate3 };
-        }
-
-        private string GetRow(IEnumerable<int> rowCoordinates)
-        {
-            var duplicateRowCoordinate = GetDuplicateCoordinate(rowCoordinates);
-            var singleRowCoordinate = rowCoordinates.Where(r => r != duplicateRowCoordinate).First();
-
-            int rowIndex;
-            if (duplicateRowCoordinate < singleRowCoordinate)
-            {
-                rowIndex = (singleRowCoordinate / HEIGHT);
-            }
-            else
-            {
-                rowIndex = (duplicateRowCoordinate / HEIGHT);
-            }
-
-            return _rows[rowIndex - 1];
-        }
-
-        private int GetColumn(IEnumerable<int> columnCoordinate)
-        {
-            var duplicateRowCoordinate = GetDuplicateCoordinate(columnCoordinate);
-            var singleColumnCoordinate = columnCoordinate.Where(r => r != duplicateRowCoordinate).First();
-
-            var largestCoordinate = columnCoordinate.Max();
-            var largestColumn = largestCoordinate / 5;
-
-            if (duplicateRowCoordinate > singleColumnCoordinate)
-            {
-                return largestColumn;
-            }
-            else
-            {
-                return largestColumn - 1;
-            }
-        }
-
-        private int GetDuplicateCoordinate(IEnumerable<int> coordinates)
-        {
-            return coordinates.GroupBy(c => c)
-                .Select(c => new { Coordinate = c.Key, Count = c.Count() })
-                .OrderByDescending(g => g.Count)
-                .First()
-                .Coordinate;
-        }
-        private int GetTopRowCoordinateLocation(string row)
-        {
-            var x = Array.FindIndex(_rows, r => r == row);
-            return (x * HEIGHT);
-        }
-
-        private int GetBottomRowCoordinateLocation(int coordinateLocation)
-        {
-            return coordinateLocation + HEIGHT;
-        }
-
-        private int GetLeftCoordinateLocation(int rightPosition)
-        {
-            return rightPosition - (WIDTH * 2);
-        }
-
-        private int GetRightCoordinateLocation(int column)
-        {
-            if (IsIntegerEven(column))
-            {
-                return (column * WIDTH);
-            }
-            else
-            {
-                return ((column + 1) * WIDTH);
-            }
-        }
-
-        private bool IsIntegerEven(int number)
-        {
-            return number % 2 == 0;
-        }
-
-        private struct CoordinateStruct
-        {
-            public int row;
-            public int column;
-        }
-
-        private void BuildExpectedResults()
-        {
-            int rightColumnCoordinate = 0;
-            int leftColumnCoordinate = 0;
-
-            foreach (string row in _rows)
-            {
-                for (int i = 1; i < 13; i++)
-                {
-                    Coordinate coordinate1 = new Coordinate();
-                    Coordinate coordinate2 = new Coordinate();
-                    Coordinate coordinate3 = new Coordinate();
-
-                    int topRowCoordinate = GetTopRowCoordinateLocation(row);
-                    int bottomRowCoordinate = GetBottomRowCoordinateLocation(topRowCoordinate);
-                    rightColumnCoordinate = GetRightCoordinateLocation(i);
-                    leftColumnCoordinate = GetLeftCoordinateLocation(rightColumnCoordinate);
-
-                    if (IsIntegerEven(i))
-                    {
-                        coordinate1.row = topRowCoordinate;
-                        coordinate1.column = leftColumnCoordinate;
-                        coordinate2.row = topRowCoordinate;
-                        coordinate2.column = rightColumnCoordinate;
-                        coordinate3.row = bottomRowCoordinate;
-                        coordinate3.column = rightColumnCoordinate;   
-                    }
-                    else
-                    {
-                        coordinate1.row = topRowCoordinate;
-                        coordinate1.column = leftColumnCoordinate;
-                        coordinate2.row = bottomRowCoordinate;
-                        coordinate2.column = leftColumnCoordinate;
-                        coordinate3.row = bottomRowCoordinate;
-                        coordinate3.column = rightColumnCoordinate;
-                    }
-
-                    _triangleCoordinates.Add(row + i, new List<Coordinate> { coordinate1, coordinate2, coordinate3 });
-
-                }
-            }
-        }
-
         private void ManuallyBuildExpectedResults()
         {
             AddOddColumnCoordinate("A1", 0, 0);
@@ -470,6 +302,12 @@ namespace NuNitTestProject
 
         }
 
+        /// <summary>
+        /// Add the coordinates for odd columns
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="topRowLocation"></param>
+        /// <param name="leftColumnlocation"></param>
         private void AddOddColumnCoordinate(string location, int topRowLocation, int leftColumnlocation)
         {
             Coordinate coordinate1 = new Coordinate { row = topRowLocation, column = leftColumnlocation };
@@ -478,6 +316,12 @@ namespace NuNitTestProject
             _triangleCoordinates.Add(location, new List<Coordinate> { coordinate1, coordinate2, coordinate3 });
         }
 
+        /// <summary>
+        /// Add the coordinates for even columns
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="topRowLocation"></param>
+        /// <param name="leftColumnlocation"></param>
         private void AddEvenColumnCoordinate(string location, int topRowLocation, int leftColumnlocation)
         {
             Coordinate coordinate1 = new Coordinate { row = topRowLocation, column = leftColumnlocation };

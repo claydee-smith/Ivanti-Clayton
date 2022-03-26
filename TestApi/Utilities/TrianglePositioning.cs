@@ -68,6 +68,12 @@ namespace TestApi.Utilities
             return GetLocation(coordinates);
         }
 
+        /// <summary>
+        /// Validate the location
+        /// </summary>
+        /// <param name="row">Row of location</param>
+        /// <param name="column">Column of location</param>
+        /// <exception cref="ArgumentException">Argument Exception if location is not valid</exception>
         private static void IsLocationValid(string row, int column)
         {
             if (_rows.Any(r => r == row) == false)
@@ -79,10 +85,13 @@ namespace TestApi.Utilities
             {
                 throw new ArgumentException("Triangle column location is not valid.");
             }
-
-            //return true;
         }
 
+        /// <summary>
+        /// Validate coordinates
+        /// </summary>
+        /// <param name="coordinates">Coordinates of the triangle</param>
+        /// <exception cref="ArgumentException">Argument Exception if coordinates are not valid</exception>
         private static void AreCoordinatesValid(IEnumerable<Coordinate> coordinates)
         {
             foreach (Coordinate coordinate in coordinates)
@@ -90,19 +99,24 @@ namespace TestApi.Utilities
                 if (coordinate == null ||
                     _locations.Any(c => c == coordinate.row) == false ||
                     _locations.Any(c => c == coordinate.column) == false ||
-                    AreRowAndColumnLocationsValid(coordinates) == false)
+                    AreRowAndColumnPositionsValid(coordinates) == false)
                 {
                     throw new ArgumentException("One or more coordinates is invalid.");
                 }
             }
         }
 
-        private static bool AreRowAndColumnLocationsValid(IEnumerable<Coordinate> coordinates)
+        /// <summary>
+        /// Validate the integers passed in for the row and column coordinates
+        /// </summary>
+        /// <param name="coordinates"></param>
+        /// <returns></returns>
+        private static bool AreRowAndColumnPositionsValid(IEnumerable<Coordinate> coordinates)
         {
             IEnumerable<int> columnPositions = coordinates.Select(c => c.column);
             IEnumerable<int> rowPositions = coordinates.Select(c => c.row);
 
-            if ((AreLocationsValid(columnPositions) && AreLocationsValid(rowPositions)))
+            if ((ArePositionsValid(columnPositions) && ArePositionsValid(rowPositions)))
             {
                 return true;
             }
@@ -110,7 +124,12 @@ namespace TestApi.Utilities
             return false;
         }
 
-        private static bool AreLocationsValid(IEnumerable<int> positions)
+        /// <summary>
+        /// Validate the set of rows/columns are valid.  Should always have 2 of the same position and the other position should be different by 10
+        /// </summary>
+        /// <param name="positions">IEnumerable of positions for either the row or column</param>
+        /// <returns></returns>
+        private static bool ArePositionsValid(IEnumerable<int> positions)
         {
             var duplicateLocation = positions.GroupBy(c => c)
                 .Select(c => new { Location = c.Key, Count = c.Count() })
@@ -217,11 +236,11 @@ namespace TestApi.Utilities
             int rowIndex;
             if (duplicateRowCoordinate < singleRowCoordinate)
             {
-                rowIndex = (singleRowCoordinate / 10);
+                rowIndex = (singleRowCoordinate / HEIGHT);
             }
             else
             {
-                rowIndex = (duplicateRowCoordinate / 10);
+                rowIndex = (duplicateRowCoordinate / HEIGHT);
             }
 
             return _rows[rowIndex - 1];
@@ -238,7 +257,7 @@ namespace TestApi.Utilities
             var singleColumnCoordinate = columnCoordinate.Where(r => r != duplicateRowCoordinate).First();
 
             var largestCoordinate = columnCoordinate.Max();
-            var largestColumn = largestCoordinate / 5;
+            var largestColumn = largestCoordinate / WIDTH;
 
             if (duplicateRowCoordinate > singleColumnCoordinate)
             {
