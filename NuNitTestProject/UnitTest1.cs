@@ -20,48 +20,28 @@ namespace NuNitTestProject
         private const string INVALID_LOCATION_ERR_MSG = "Triangle row location is not valid.";
         private const string EXCEPTION_NOT_NULL_MSG = "Exception should not be null";
 
+        /// <summary>
+        /// Build the grid with the triangle  locations and corresponding coordinates
+        /// </summary>
         [OneTimeSetUp]
         public void Setup()
         {
             BuildExpectedResults();
         }
+        
+#region return location tests
 
-        //[Test]
-        //public void Test1()
-        //{
-        //    var triangleController = new TriangleController();
-        //    var coordinates = triangleController.GetTriangleCoordinates("A", 1);
-
-        //    Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
-        //    Coordinate coordinate2 = new Coordinate { column = 0, row = 10 };
-        //    Coordinate coordinate3 = new Coordinate { column = 10, row = 10 };
-        //    var location = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
-        //    Assert.AreEqual("A1", location, "location should equal");
-
-        //    coordinate1 = new Coordinate { column = 50, row = 50 };
-        //    coordinate2 = new Coordinate { column = 60, row = 50 };
-        //    coordinate3 = new Coordinate { column = 60, row = 60 };
-        //    location = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
-        //    Assert.AreEqual("F12", location, "location should equal");
-
-        //    coordinate1 = new Coordinate { column = 30, row = 30 };
-        //    coordinate2 = new Coordinate { column = 40, row = 30 };
-        //    coordinate3 = new Coordinate { column = 40, row = 40 };
-        //    location = triangleController.GetTriangleLocation(coordinate1, coordinate2, coordinate3);
-        //    Assert.AreEqual("D8", location, "location should equal");
-
-        //}
-
+        /// <summary>
+        /// Test passing in all the triangle coordinates to get the triangle location
+        /// loop thru triangle coordinaetes
+        /// - get the each set of coordinates
+        /// - get the expected location
+        /// - call api
+        /// - assert locations equal
+        /// </summary>
         [Test]
         public void ReturnLocationTest()
         {
-            /*
-             * loop thru triangle coordinaetes
-             * - get the each set of coordinates
-             * - get the expected location
-             * - call api
-             * - assert locations equal
-             */
             var triangleController = new TriangleController();
 
             foreach (var triangleLocation in _triangleCoordinates)
@@ -79,9 +59,71 @@ namespace NuNitTestProject
             }
         }
 
- #region return location
+        /// <summary>
+        /// Test when all coordinates are the same returns an exception
+        /// </summary>
+        [Test]
+        public void AllCoordinatesTheSame()
+        {
+            var triangleController = new TriangleController();
 
-         [Test]
+            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(new Coordinate(), new Coordinate(), new Coordinate()));
+            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+        }
+
+        /// <summary>
+        /// Test an invalid row coordinate returns an exception
+        /// </summary>
+        [Test]
+        public void InvalidRowCoordinate()
+        {
+            var triangleController = new TriangleController();
+
+            Coordinate coordinate = new Coordinate { column = 10, row = 1 };
+            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate()));
+            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+        }
+
+        /// <summary>
+        /// Test an invalid column coordinate returns an exception
+        /// </summary>
+        [Test]
+        public void InvalidColumnCoordinate()
+        {
+            var triangleController = new TriangleController();
+
+            Coordinate coordinate = new Coordinate { column = 1, row = 10 };
+            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate()));
+            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+        }
+
+        /// <summary>
+        /// Test an invalid row/column combination coordinate returns an exception
+        /// </summary>
+        [Test]
+        public void InvalidCoordinateCombination()
+        {
+            var triangleController = new TriangleController();
+
+            Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
+            Coordinate coordinate2 = new Coordinate { column = 50, row = 50 };
+            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate1, coordinate2, new Coordinate()));
+            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
+        }
+
+        #endregion return location tests
+
+        #region return coordinates tests
+
+        /// <summary>
+        /// Test passing in all the triangle locations to get the triangle coordinates
+        /// loop thru triangle coordinaetes
+        /// - get the each set of coordinates
+        /// - get the expected location
+        /// - call api
+        /// - assert locations equal
+        /// </summary>
+        [Test]
         public void ReturnCoordinatesTest()
         {
             var triangleController = new TriangleController();
@@ -106,6 +148,9 @@ namespace NuNitTestProject
             }
         }
 
+        /// <summary>
+        /// Test the an invalid location row returns an exception
+        /// </summary>
         [Test]
         public void InvalidRowLocation()
         {
@@ -113,10 +158,11 @@ namespace NuNitTestProject
            
             var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleCoordinates("Z", 1));
             AssertException(exception, "Triangle row location is not valid.");
-            //Assert.IsNotNull(exception, "exception should not be null");
-            //Assert.AreEqual(exception.Message, "Triangle row location is not valid.");
         }
 
+        /// <summary>
+        /// Test the a location column < 0 returns an exception
+        /// </summary>
         [Test]
         public void InvalidColumnLocationTooSmall()
         {
@@ -124,10 +170,11 @@ namespace NuNitTestProject
 
             var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleCoordinates("A", -1));
             AssertException(exception, "Triangle column location is not valid.");
-            //Assert.IsNotNull(exception, "exception should not be null");
-            //Assert.AreEqual(exception.Message, "Triangle column location is not valid.");
         }
 
+        /// <summary>
+        /// Test the a location column > 12 returns an exception
+        /// </summary>
         [Test]
         public void InvalidColumnLocationTooBig()
         {
@@ -137,60 +184,63 @@ namespace NuNitTestProject
             AssertException(exception, "Triangle column location is not valid.");
         }
 
-        [Test]
-        public void AllCoordinatesTheSame()
-        {
-            var triangleController = new TriangleController();
+        
+        #endregion return coordinates tests
 
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(new Coordinate(), new Coordinate(), new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
-        }
-
-        [Test]
-        public void InvalidRowCoordinate()
-        {
-            var triangleController = new TriangleController();
-
-            Coordinate coordinate = new Coordinate { column = 10, row = 1 };
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
-        }
-
-        [Test]
-        public void InvalidColumnCoordinate()
-        {
-            var triangleController = new TriangleController();
-
-            Coordinate coordinate = new Coordinate { column = 1, row = 10 };
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate, new Coordinate(), new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
-        }
-
-        [Test]
-        public void InvalidCoordinateCombination()
-        {
-            var triangleController = new TriangleController();
-
-            Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
-            Coordinate coordinate2 = new Coordinate { column = 50, row = 50 };
-            var exception = Assert.Throws<ArgumentException>(() => triangleController.GetTriangleLocation(coordinate1, coordinate2, new Coordinate()));
-            AssertException(exception, INVALID_COORDINATE_ERR_MSG);
-        }
-
+        /// <summary>
+        /// Method to assert correct exception thrown
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="message"></param>
         private void AssertException(Exception exception, string message)
         {
             Assert.IsNotNull(exception, EXCEPTION_NOT_NULL_MSG);
             Assert.AreEqual(exception.Message, message);
         }
-        private string GetLocation(IEnumerable<CoordinateStruct> coordinates)
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        private IEnumerable<CoordinateStruct> GetCoordinatePositions(string row, int column)
         {
-            var rows = coordinates.Select(c => c.row);
-            var columns = coordinates.Select(c => c.column);
+            int topRowLocation = GetTopRowCoordinateLocation(row);
+            int bottomRowLocation = GetBottomRowCoordinateLocation(topRowLocation);
+            int righttColumnLocation = GetRightCoordinateLocation(column);
+            int leftColumnLocation = GetLeftCoordinateLocation(righttColumnLocation);
 
-            var row = GetRow(rows);
-            var column = GetColumn(columns);
+            //topRowLocation = topRowLocation == -1 ? 0 : topRowLocation;
+            //leftColumnLocation = leftColumnLocation == -1 ? 0 : leftColumnLocation;
 
-            return row + column;
+            CoordinateStruct coordinate1 = new CoordinateStruct();
+            coordinate1.row = topRowLocation;
+            coordinate1.column = leftColumnLocation;
+
+            CoordinateStruct coordinate2 = new CoordinateStruct();
+            coordinate2.row = bottomRowLocation;
+            coordinate2.column = righttColumnLocation;
+
+            CoordinateStruct coordinate3 = new CoordinateStruct();
+            if (IsIntegerEven(column))
+            {
+                coordinate3.row = topRowLocation;
+                coordinate3.column = righttColumnLocation;
+            }
+            else
+            {
+                coordinate3.row = bottomRowLocation;
+                coordinate3.column = leftColumnLocation;
+            }
+            //hyp 1 is always top and left positions
+            //hyp 2 is always bottom and  right
+            //coord 3 is based on the column
+            //  if even then top and right positions
+            //    else bottom ande left positions
+
+            return new List<CoordinateStruct> { coordinate1, coordinate2, coordinate3 };
         }
 
         private string GetRow(IEnumerable<int> rowCoordinates)
@@ -237,100 +287,6 @@ namespace NuNitTestProject
                 .First()
                 .Coordinate;
         }
-        #endregion return location
-
-        #region return coordinates
-        //[Test]
-        //public void Test2var ()
-        //{
-        //    var triangleController = new TriangleController();
-        //    //IEnumerable<CoordinateStruct> coordinates = GetCoordinatePositions("B", 1);
-        //    var coordinates = triangleController.GetTriangleCoordinates("B", 1);
-        //    Assert.IsNotNull(coordinates);
-        //    Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
-        //    foreach (Coordinate coord in coordinates)
-        //    {
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 0 && c.row == 10), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 0 && c.row == 20), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 10 && c.row == 20), "should have found coordinate");
-        //    }
-
-
-        //    coordinates = triangleController.GetTriangleCoordinates("E", 8);
-        //    Assert.IsNotNull(coordinates);
-        //    Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
-        //    foreach (Coordinate coord in coordinates)
-        //    {
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 30 && c.row == 40), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 40 && c.row == 40), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 40 && c.row == 50), "should have found coordinate");
-        //    }
-
-        //    coordinates = triangleController.GetTriangleCoordinates("A", 1);
-        //    Assert.IsNotNull(coordinates);
-        //    Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
-        //    foreach (Coordinate coord in coordinates)
-        //    {
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 0 && c.row == 0), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 0 && c.row == 10), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 10 && c.row == 10), "should have found coordinate");
-        //    }
-
-        //    coordinates = triangleController.GetTriangleCoordinates("F", 12);
-        //    Assert.IsNotNull(coordinates);
-        //    Assert.AreEqual(3, coordinates.Count(), "Coordinate count should be 3");
-        //    foreach (Coordinate coord in coordinates)
-        //    {
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 50 && c.row == 50), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 60 && c.row == 50), "should have found coordinate");
-        //        Assert.IsTrue(coordinates.Any(c => c.column == 60 && c.row == 60), "should have found coordinate");
-        //    }
-        //}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        private IEnumerable<CoordinateStruct> GetCoordinatePositions(string row, int column)
-        {
-            int topRowLocation = GetTopRowCoordinateLocation(row);
-            int bottomRowLocation = GetBottomRowCoordinateLocation(topRowLocation);
-            int righttColumnLocation = GetRightCoordinateLocation(column);
-            int leftColumnLocation = GetLeftCoordinateLocation(righttColumnLocation);
-
-            //topRowLocation = topRowLocation == -1 ? 0 : topRowLocation;
-            //leftColumnLocation = leftColumnLocation == -1 ? 0 : leftColumnLocation;
-
-            CoordinateStruct coordinate1 = new CoordinateStruct();
-            coordinate1.row = topRowLocation;
-            coordinate1.column = leftColumnLocation;
-
-            CoordinateStruct coordinate2 = new CoordinateStruct();
-            coordinate2.row = bottomRowLocation;
-            coordinate2.column = righttColumnLocation;
-
-            CoordinateStruct coordinate3 = new CoordinateStruct();
-            if (IsIntegerEven(column))
-            {
-                coordinate3.row = topRowLocation;
-                coordinate3.column = righttColumnLocation;
-            }
-            else
-            {
-                coordinate3.row = bottomRowLocation;
-                coordinate3.column = leftColumnLocation;
-            }
-            //hyp 1 is always top and left positions
-            //hyp 2 is always bottom and  right
-            //coord 3 is based on the column
-            //  if even then top and right positions
-            //    else bottom ande left positions
-
-            return new List<CoordinateStruct> { coordinate1, coordinate2, coordinate3 };
-        }
-
         private int GetTopRowCoordinateLocation(string row)
         {
             var x = Array.FindIndex(_rows, r => r == row);
@@ -369,7 +325,6 @@ namespace NuNitTestProject
             public int row;
             public int column;
         }
-        #endregion return coordinates
 
         private void BuildExpectedResults()
         {
