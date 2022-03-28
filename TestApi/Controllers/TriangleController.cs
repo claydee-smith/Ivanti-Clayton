@@ -22,16 +22,21 @@ namespace TestApi.Controllers
             }
         }
 
-        [HttpGet("GetTriangleLocationByCoordinates")]
-        public ActionResult<string> GetTriangleLocationByCoordinates(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
+        [HttpPost("GetTriangleLocationByCoordinates")]
+        public ActionResult<string> GetTriangleLocationByCoordinates(IEnumerable<Coordinate> coordinates)
         {
+            if (coordinates == null || coordinates.Count() != 3)
+            {
+                return BadRequest("Must provide exactly three coordinates.");
+            }
+
             try
             {
-                return Ok(TrianglePositioning.GetTriangleLocationByCoordinates(coordinate1, coordinate2, coordinate3));
+                return Ok(TrianglePositioning.GetTriangleLocationByCoordinates(coordinates.First(), coordinates.ElementAt(1), coordinates.Last()));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);  
+                return BadRequest(ex.Message);
             }
         }
     }

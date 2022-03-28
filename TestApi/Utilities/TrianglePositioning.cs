@@ -70,7 +70,7 @@ namespace TestApi.Utilities
         /// <exception cref="ArgumentException">Argument Exception if location is not valid</exception>
         private static void IsLocationValid(string row, int column)
         {
-            if (_rows.Any(r => r == row) == false)
+            if (_rows.Any(r => r == row.ToUpper()) == false)
             {
                 throw new ArgumentException("Triangle row location is not valid.");
             }
@@ -95,7 +95,7 @@ namespace TestApi.Utilities
                     _locations.Any(c => c == coordinate.column) == false ||
                     AreRowAndColumnPositionsValid(coordinates) == false)
                 {
-                    throw new ArgumentException("One or more coordinates is invalid.");
+                    throw new ArgumentException("One or more coordinates are invalid.");
                 }
             }
         }

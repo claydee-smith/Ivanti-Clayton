@@ -15,7 +15,8 @@ namespace NuNitTestProject
         private Dictionary<string, List<Coordinate>>  _triangleCoordinates = new Dictionary<string, List<Coordinate>>();
 
         private const int HEIGHT = 10;
-        private const string INVALID_COORDINATE_ERR_MSG = "One or more coordinates is invalid.";
+        private const string INVALID_COORDINATE_ERR_MSG = "One or more coordinates are invalid.";
+        private const string INVALID_NUMBER_OF_COORDINATES_ERR_MSG = "Must provide exactly three coordinates.";
 
         /// <summary>
         /// Build the grid of expected results for the triangle locations with corresponding coordinates
@@ -50,7 +51,7 @@ namespace NuNitTestProject
                 Coordinate coordinate2 = triangleLocation.Value[1];
                 Coordinate coordinate3 = triangleLocation.Value[2];
 
-                var response = triangleController.GetTriangleLocationByCoordinates(coordinate1, coordinate2, coordinate3);
+                var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate[] {coordinate1, coordinate2, coordinate3});
                 Assert.IsNotNull(response, "Response should not be null");
                 Assert.IsInstanceOf<OkObjectResult>(response.Result, "Rsponse should be Ok");
 
@@ -60,13 +61,35 @@ namespace NuNitTestProject
         }
 
         /// <summary>
+        /// Test null coordinates  returns a BadResponse
+        /// </summary>
+        [Test]
+        public void NullCoordinates()
+        {
+            var triangleController = new TriangleController();
+            var response = triangleController.GetTriangleLocationByCoordinates(null);
+            ValidateBadResponseForNotEnoughCoordinates(response);
+        }
+
+        /// <summary>
+        /// Test null coordinates  returns a BadResponse
+        /// </summary>
+        [Test]
+        public void NotEnoughCoordinates()
+        {
+            var triangleController = new TriangleController();
+            var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate[] {new Coordinate { column = 10, row = 10} });
+            ValidateBadResponseForNotEnoughCoordinates(response);
+        }
+
+        /// <summary>
         /// Test when all coordinates are the same returns a BadResponse
         /// </summary>
         [Test]
         public void AllCoordinatesTheSame()
         {
             var triangleController = new TriangleController();
-            var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate(), new Coordinate(), new Coordinate());
+            var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate[] { new Coordinate(), new Coordinate(), new Coordinate()});
             ValidateBadResponsetForInvalidCoordinates(response);
         }
 
@@ -79,7 +102,7 @@ namespace NuNitTestProject
             var triangleController = new TriangleController();
 
             Coordinate coordinate = new Coordinate { column = 10, row = 1 };
-            var response = triangleController.GetTriangleLocationByCoordinates(coordinate, new Coordinate(), new Coordinate());
+            var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate[] { coordinate, new Coordinate(), new Coordinate()});
             ValidateBadResponsetForInvalidCoordinates(response);
         }
 
@@ -92,7 +115,7 @@ namespace NuNitTestProject
             var triangleController = new TriangleController();
 
             Coordinate coordinate = new Coordinate { column = 1, row = 10 };
-            var response = triangleController.GetTriangleLocationByCoordinates(coordinate, new Coordinate(), new Coordinate());
+            var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate[] { coordinate, new Coordinate(), new Coordinate() });
             ValidateBadResponsetForInvalidCoordinates(response);
         }
 
@@ -106,12 +129,12 @@ namespace NuNitTestProject
 
             Coordinate coordinate1 = new Coordinate { column = 0, row = 0 };
             Coordinate coordinate2 = new Coordinate { column = 50, row = 50 };
-            var response = triangleController.GetTriangleLocationByCoordinates(coordinate1, coordinate2, new Coordinate());
+            var response = triangleController.GetTriangleLocationByCoordinates(new Coordinate[] { coordinate1, coordinate2, new Coordinate() });
             ValidateBadResponsetForInvalidCoordinates(response);
         }
 
         /// <summary>
-        /// Commmon method to validate the resonse is bad and the expected error message is returned
+        /// Commmon method to validate the response is bad and the expected error message is returned
         /// </summary>
         /// <param name="actionResult"></param>
         private void ValidateBadResponsetForInvalidCoordinates(ActionResult<string> actionResult)
@@ -120,6 +143,17 @@ namespace NuNitTestProject
             Assert.IsInstanceOf<BadRequestObjectResult>(actionResult.Result, "Response should be Bad");
             var errorMessage = ((BadRequestObjectResult)actionResult.Result).Value;
             Assert.AreEqual(errorMessage, INVALID_COORDINATE_ERR_MSG, "wrong error message returned.");
+        }
+
+        /// <summary>
+        /// Commmon method to validate the response is bad and the expected invalid number of coordinates error message is returned
+        /// </summary>
+        private void ValidateBadResponseForNotEnoughCoordinates(ActionResult<string> actionResult)
+        {
+            Assert.IsNotNull(actionResult, "Response should not be null");
+            Assert.IsInstanceOf<BadRequestObjectResult>(actionResult.Result, "Response should be Bad");
+            var errorMessageReturned = ((BadRequestObjectResult)actionResult.Result).Value;
+            Assert.AreEqual(INVALID_NUMBER_OF_COORDINATES_ERR_MSG, errorMessageReturned, "wrong error message returned.");
         }
         #endregion return location tests
 
