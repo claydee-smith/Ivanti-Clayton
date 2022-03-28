@@ -9,6 +9,9 @@
 
     <script>
         function draw() {
+            const location = prompt("What location should the triangle be drawn?");
+            //cal the api here
+
             var canvas = document.getElementById('canvas');
 
             if (canvas.getContext) {
@@ -44,9 +47,9 @@
 
 
                 context.beginPath();
-                context.moveTo(10, 10);
-                context.lineTo(0, 10);
-                context.lineTo(0, 0);
+                context.moveTo(60, 60);
+                context.lineTo(50, 60);
+                context.lineTo(50, 50);
                 context.fill();
             }
         }
