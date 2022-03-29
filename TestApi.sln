@@ -8,9 +8,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuNitTestProject", "NuNitTestProject\NuNitTestProject.csproj", "{D2E11239-009B-495A-A281-158D362D531E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8237C401-C78A-47F3-930A-FB80152105BD}"
-	ProjectSection(SolutionItems) = preProject
-		index.html = index.html
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
