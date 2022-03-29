@@ -22,6 +22,12 @@ namespace TestApi.Controllers
             }
         }
 
+        [HttpGet("JCS")]
+        public ActionResult<string> JCS()
+        {
+            return Ok("JCS");
+        }
+
         [HttpPost("GetTriangleLocationByCoordinates")]
         public ActionResult<string> GetTriangleLocationByCoordinates(IEnumerable<Coordinate> coordinates)
         {
