@@ -9,12 +9,18 @@ namespace TestApi.Controllers
     [Route("[controller]")]
     public class TriangleController : ControllerBase
     {
+        /// <summary>
+        /// Get the coordinates for a triangle based on a given row and column
+        /// </summary>
+        /// <param name="row">row location for the triangle, must be a letter 'A-F'</param>
+        /// <param name="column">column location for the triangle, must be a multiple of ten number 1-60</param>
+        /// <returns>The three coordinate locations of the triangle</returns>
         [HttpGet("GetTriangleCoordinatesByLocation")]
         public ActionResult<IEnumerable<Coordinate>> GetTriangleCoordinatesByLocation(string row, int column)
         {
             try
             {
-                return Ok(TrianglePositioning.GetTriangleCoordinatesByLocation(row, column));
+                return Ok(TrianglePositioning.GetTriangleCoordinatesByLocation(row.ToUpper(), column));
             }
             catch (Exception ex)
             {
@@ -22,6 +28,12 @@ namespace TestApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Get the triangle based on the coordinates passed in
+        /// </summary>
+        /// <param name="coordinates">The set of three coordinates for the triangle.  Each set of coordinates must have a row and column value.  
+        /// The row must be must be a letter 'A-F'.  The column must be a multiple of ten number 1-60</param>
+        /// <returns></returns>
         [HttpPost("GetTriangleLocationByCoordinates")]
         public ActionResult<string> GetTriangleLocationByCoordinates(IEnumerable<Coordinate> coordinates)
         {
@@ -32,7 +44,7 @@ namespace TestApi.Controllers
 
             try
             {
-                return Ok(TrianglePositioning.GetTriangleLocationByCoordinates(coordinates.First(), coordinates.ElementAt(1), coordinates.Last()));
+                return Ok(TrianglePositioning.GetTriangleLocationByCoordinates(coordinates));
             }
             catch (Exception ex)
             {

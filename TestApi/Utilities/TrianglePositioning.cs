@@ -9,6 +9,7 @@ namespace TestApi.Utilities
 
         private const int WIDTH = 5;
         private const int HEIGHT = 10;
+        private const int MAX_COLUMN_VALUE = 12;
 
         /// <summary>
         /// Get the coordinates for a triangle for a graph based on a location
@@ -55,9 +56,8 @@ namespace TestApi.Utilities
         /// <param name="coordinate2">Second coordinate for the triangle</param>
         /// <param name="coordinate3">Third coordinate for the triangle</param>
         /// <returns>The location of the triangle</returns>
-        public static string GetTriangleLocationByCoordinates(Coordinate coordinate1, Coordinate coordinate2, Coordinate coordinate3)
+        public static string GetTriangleLocationByCoordinates(IEnumerable<Coordinate> coordinates)
         {
-            List<Coordinate> coordinates = new List<Coordinate> { coordinate1, coordinate2, coordinate3 };
             AreCoordinatesValid(coordinates);
             return GetLocation(coordinates);
         }
@@ -75,7 +75,7 @@ namespace TestApi.Utilities
                 throw new ArgumentException("Triangle row location is not valid.");
             }
 
-            if ( column <0 || column > 12)
+            if ( column <0 || column > MAX_COLUMN_VALUE)
             {
                 throw new ArgumentException("Triangle column location is not valid.");
             }
